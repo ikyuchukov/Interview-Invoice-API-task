@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: docker/php-fpm/Dockerfile
     volumes:
-      - ./:/var/www/html
+      - ./app/:/var/www/html
       - ~/.composer:/home/invoicing-api/.composer
     expose:
       - "9000"
@@ -14,7 +14,7 @@ services:
     container_name: invoicing-api-nginx
     image: nginx:1.22.0
     volumes:
-      - ./docker/config/site.conf:/etc/nginx/conf.d/default.conf
+      - ./docker/nginx/config/site.conf:/etc/nginx/conf.d/default.conf
     ports:
       - "8000:8000"
     depends_on:

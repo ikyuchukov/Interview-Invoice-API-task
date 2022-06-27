@@ -1,0 +1,21 @@
+version: '3.3'
+services:
+  invoicing-api-php:
+    container_name: invoicing-api-php
+    build:
+      context: .
+      dockerfile: docker/php-fpm/Dockerfile
+    volumes:
+      - ./:/var/www/html
+      - ~/.composer:/home/invoicing-api/.composer
+    expose:
+      - "9000"
+  invoicing-api-nginx:
+    container_name: invoicing-api-nginx
+    image: nginx:1.22.0
+    volumes:
+      - ./docker/config/site.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "8000:8000"
+    depends_on:
+      - invoicing-api-php

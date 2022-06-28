@@ -1,7 +1,7 @@
 FROM php:8.1-fpm-bullseye
-RUN apt update && apt install -y --no-install-recommends git zip unzip
+RUN apt update && apt install -y --no-install-recommends git zip unzip libicu-dev
 RUN pecl zip
-RUN docker-php-ext-install bcmath
+RUN docker-php-ext-install bcmath intl
 RUN curl --silent --show-error https://getcomposer.org/installer | php
 RUN mv composer.phar /usr/local/bin/composer
 ARG UNAME=invoicing-api

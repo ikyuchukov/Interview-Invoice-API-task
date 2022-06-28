@@ -24,13 +24,13 @@ class ExchangeRateImporter
     public function importMultipleRates(array $exchangeRates): void
     {
         $defaultCurrency = $this->getDefaultCurrency($exchangeRates);
-        if (null === $this->storageAdapter->get('exchange_rate')) {
-            $this->storageAdapter->set('exchange_rate', []);
+        if (null === $this->storageAdapter->get(StorageAdapter::REPOSITORY_EXCHANGE_RATE)) {
+            $this->storageAdapter->set(StorageAdapter::REPOSITORY_EXCHANGE_RATE, []);
         }
-        $this->storageAdapter->set('default_currency', $defaultCurrency);
+        $this->storageAdapter->set(StorageAdapter::REPOSITORY_DEFAULT_CURRENCY, $defaultCurrency);
         foreach ($exchangeRates as $exchangeRate) {
             $this->storageAdapter->addWithAssociativeKey(
-                'exchange_rate',
+                StorageAdapter::REPOSITORY_EXCHANGE_RATE,
                 $exchangeRate->getCurrency()->getCode(),
                 $exchangeRate
             );

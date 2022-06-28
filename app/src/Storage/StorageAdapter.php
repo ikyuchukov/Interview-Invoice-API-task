@@ -5,12 +5,12 @@ namespace App\Storage;
 
 class StorageAdapter implements DataStorageInterface
 {
-    public const REPOSITORY_NAME_EXCHANGE_RATE = 'exchange_rate';
-    public const REPOSITORY_NAME_DEFAULT_CURRENCY = 'default_currency';
+    public const REPOSITORY_EXCHANGE_RATE = 'exchange_rate';
+    public const REPOSITORY_DEFAULT_CURRENCY = 'default_currency';
+    public const REPOSITORY_TRANSACTION = 'transaction';
 
     public function __construct(
-        private InMemoryStorage $dataStorage,
-        private string $storageName = 'default',
+        private InMemoryStorage $dataStorage
     ) {
     }
 

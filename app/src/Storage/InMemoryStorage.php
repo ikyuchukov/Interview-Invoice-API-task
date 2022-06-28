@@ -7,8 +7,9 @@ use App\Storage\Exception\DataKeyNotFoundException;
 
 class InMemoryStorage implements DataStorageInterface
 {
-    public function __construct(private array $memory = [])
-    {
+    public function __construct(
+        private array $memory = []
+    ) {
     }
 
     public function set($key, $object): void
@@ -57,6 +58,7 @@ class InMemoryStorage implements DataStorageInterface
      */
     public function addWithAssociativeKey($key, string $associativeKey, $object): void
     {
+        $this->memory[$key][$associativeKey] = $object;
         if (isset($this->memory[$key])) {
             $this->memory[$key][$associativeKey] = $object;
         } else {

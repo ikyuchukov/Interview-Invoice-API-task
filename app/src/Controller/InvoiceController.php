@@ -75,6 +75,8 @@ class InvoiceController extends AbstractController
             return (new JsonResponse(status: 400));
         }
 
+        $this->invoice
+
 
         return (new JsonResponse());
     }

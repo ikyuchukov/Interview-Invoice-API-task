@@ -4,19 +4,16 @@ declare(strict_types=1);
 namespace App\Denormalizer;
 
 use App\DTO\Currency;
-use App\DTO\ExchangeRate;
+use App\DTO\Money;
 use App\DTO\Transaction;
-use App\Exception\InvalidCurrencyException;
-use App\Validation\ExchangeRateConstrains;
+use App\Exception\NoExchangeRateForCurrencyException;
+use App\Service\ExchangeRateGetter;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
-use Symfony\Component\Validator\Constraints\Currency as CurrencyConstraint;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class TransactionDenormalizer implements DenormalizerInterface
 {
     public function __construct(
-        private ValidatorInterface $validator,
+        private ExchangeRateGetter $exchangeRateGetter,
     ) {
     }
 
@@ -26,14 +23,29 @@ class TransactionDenormalizer implements DenormalizerInterface
      * @param string|null $format
      * @param array $context
      *
+     * @throws NoExchangeRateForCurrencyException
      * @return Transaction
      */
     public function denormalize(mixed $data, string $type, string $format = null, array $context = []): Transaction
     {
+        if (null === $this->exchangeRateGetter->getExchangeRate($data['Currency'])) {
+            throw new NoExchangeRateForCurrencyException(sprintf(
+                'No exchange rate found for currency %s',
+                $data['Currency'])
+            );
+        }
 
         return (new Transaction())
-            ->setCurrency((new Currency())->setCode($currency['currency']))
-            ->setRate($rate['rate'])
+            ->setCustomer($data['Customer'])
+            ->setType((int) $data['Type'])
+            ->setVat($data['Vat number'])
+            ->setDocumentId($data['Document number'])
+            ->setParentDocumentId($data['Parent document'])
+            ->setTotal(
+                (new Money())
+                    ->setCurrency((new Currency())->setCode($data['Currency']))
+                    ->setAmount($data['Total'])
+            )
         ;
     }
 

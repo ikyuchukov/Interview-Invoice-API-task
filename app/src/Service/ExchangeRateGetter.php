@@ -11,12 +11,12 @@ use App\Storage\StorageAdapter;
 class ExchangeRateGetter
 {
     public function __construct(
-        private StorageAdapter $storageAdapter = (new Sto)
+        private StorageAdapter $storageAdapter
     ) {
     }
 
     public function getExchangeRate(string $currencyCode)
     {
-        return $this->storageAdapter->get(StorageAdapter::REPOSITORY_NAME_EXCHANGE_RATE);
+        return $this->storageAdapter->get(StorageAdapter::REPOSITORY_EXCHANGE_RATE);
     }
 }

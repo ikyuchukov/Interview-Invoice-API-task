@@ -3,15 +3,12 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use App\DTO\ExchangeRate;
 use App\DTO\Transaction;
-use App\Exception\InvalidCurrencyException;
 use App\Exception\InvalidTransactionException;
-use App\Exception\MultipleDefaultCurrenciesProvidedException;
-use App\Exception\NoDefaultCurrencyProvidedException;
+use App\Exception\NoExchangeRateForCurrencyException;
 use App\Storage\StorageAdapter;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
-use Symfony\Component\Serializer\Encoder\EncoderInterface;
+use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -22,17 +19,28 @@ class InvoiceImporter
         private DecoderInterface $decoder,
         private ValidatorInterface $validator,
         private DenormalizerInterface $denormalizer,
+        private StorageAdapter $storageAdapter,
     ) {
     }
 
     /**
      * @param string $pathToCsv
+     *
+     * @throws ExceptionInterface
+     * @throws NoExchangeRateForCurrencyException
      */
     public function importInvoicesFromCsv(string $pathToCsv): void
     {
         $transactionRecords = $this->decoder->decode(file_get_contents($pathToCsv), 'csv');
         $this->validateTransactionArray($transactionRecords);
-        $this->denormalizer->denormalize($transactionRecords, Transaction::class);
+        $transactions = [];
+        foreach ($transactionRecords as $transactionRecord ) {
+            $transactions[] = $this->denormalizer->denormalize($transactionRecord, Transaction::class);
+        }
+        if (null === $this->storageAdapter->get(StorageAdapter::REPOSITORY_TRANSACTION)) {
+            $this->storageAdapter->set(StorageAdapter::REPOSITORY_TRANSACTION, []);
+        }
+        $this->storageAdapter->update(StorageAdapter::REPOSITORY_TRANSACTION, $transactions);
     }
 
     /**

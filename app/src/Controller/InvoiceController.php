@@ -10,7 +10,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class InvoiceController extends AbstractController
 {
-    public function __construct(Valida)
+    public function __construct()
     {
 
     }
@@ -24,7 +24,6 @@ class InvoiceController extends AbstractController
         $exchangeRates = $request->get('exchangeRates', []);
         $customerVat = $request->get('customerVat');
 
-        $this->
         dd($outputCurrency);
     }
 }

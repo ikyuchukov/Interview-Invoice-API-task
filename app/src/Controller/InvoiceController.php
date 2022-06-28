@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -8,9 +10,21 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class InvoiceController extends AbstractController
 {
+    public function __construct(Valida)
+    {
+
+    }
+
     #[Route('/sumInvoices', name: 'sumInvoices')]
     public function sumInvoices(Request $request): Response
     {
-        dd('test');
+        //use symfony csv decoder
+        $invoicesCsv = $request->files->get('file');
+        $outputCurrency = $request->get('outputCurrency');
+        $exchangeRates = $request->get('exchangeRates', []);
+        $customerVat = $request->get('customerVat');
+
+        $this->
+        dd($outputCurrency);
     }
 }

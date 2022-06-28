@@ -9,6 +9,7 @@ use App\Exception\InvalidCurrencyException;
 use App\Exception\InvalidCurrencyRatesException;
 use App\Exception\InvalidVatException;
 use App\Service\ExchangeRateImporter;
+use App\Service\InvoiceCalculator;
 use App\Service\InvoiceImporter;
 use App\Validation\ExchangeRateConstrains;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,6 +22,7 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Validator\Constraints\All as AllConstraint;
 use Symfony\Component\Validator\Constraints\Currency as CurrencyConstraint;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class InvoiceController extends AbstractController
@@ -31,6 +33,7 @@ class InvoiceController extends AbstractController
         private ExchangeRateConstrains $exchangeRateConstrains,
         private ExchangeRateImporter $exchangeRateImporter,
         private InvoiceImporter $invoiceImporter,
+        private InvoiceCalculator $invoiceCalculator,
     ) {
     }
 
@@ -45,7 +48,7 @@ class InvoiceController extends AbstractController
         $invoicesCsv = $request->files->get('file');
         $outputCurrency = $request->get('outputCurrency', '');
         $exchangeRates = $request->get('exchangeRates', []);
-        $customerVat = $request->get('customerVat', '');
+        $customerVat = $request->get('customerVat');
 
         if (null === $invoicesCsv) {
             return (new JsonResponse(status: 400));
@@ -75,7 +78,7 @@ class InvoiceController extends AbstractController
             return (new JsonResponse(status: 400));
         }
 
-        $this->invoice
+        if ($customerVat){}
 
 
         return (new JsonResponse());
@@ -84,7 +87,7 @@ class InvoiceController extends AbstractController
     /**
      * @param string $outputCurrency
      * @param array $exchangeRates
-     * @param string $customerVat
+     * @param ?string $customerVat
      * @throws InvalidVatException
      * @throws InvalidCurrencyRatesException
      * @throws InvalidCurrencyException
@@ -92,7 +95,7 @@ class InvoiceController extends AbstractController
     private function validateSumInvoicesArguments(
         string $outputCurrency,
         array $exchangeRates,
-        string $customerVat
+        ?string $customerVat
     ): void {
         if (
             0 < count($this->validator->validate($outputCurrency, [new (new NotBlank()), (new CurrencyConstraint())]))
@@ -116,7 +119,10 @@ class InvoiceController extends AbstractController
             );
         }
 
-        if (0 < count($this->validator->validate($customerVat, new NotBlank()))) {
+        if (
+            $customerVat !== null
+            && 0 < count($this->validator->validate($customerVat, new NotBlank()))
+        ) {
             throw new InvalidVatException(sprintf('Provided VAT %s is invalid', $customerVat));
         }
     }

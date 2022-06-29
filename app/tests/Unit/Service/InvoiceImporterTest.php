@@ -244,6 +244,96 @@ class InvoiceImporterTest extends TestCase
                 ],
             )
         ;
+        $transactions = [
+            (new Transaction())
+                ->setCustomer('Vendor 1')
+                ->setVat('123456789')
+                ->setDocumentId('1000000257')
+                ->setType(1)
+                ->setParentDocumentId()
+                ->setTotal(
+                    (new Money())
+                        ->setCurrency((new Currency())->setCode('USD'))
+                        ->setAmount('400')
+                ),
+            (new Transaction())
+                ->setCustomer('Vendor 2')
+                ->setVat('987654321')
+                ->setDocumentId('1000000258')
+                ->setType(1)
+                ->setParentDocumentId()
+                ->setTotal(
+                    (new Money())
+                        ->setCurrency((new Currency())->setCode('EUR'))
+                        ->setAmount('900')
+                ),
+            (new Transaction())
+                ->setCustomer('Vendor 3')
+                ->setVat('123465123')
+                ->setDocumentId('1000000259')
+                ->setType(1)
+                ->setParentDocumentId()
+                ->setTotal(
+                    (new Money())
+                        ->setCurrency((new Currency())->setCode('GBP'))
+                        ->setAmount('1300')
+                ),
+            (new Transaction())
+                ->setCustomer('Vendor 1')
+                ->setVat('123456789')
+                ->setDocumentId('1000000260')
+                ->setType(2)
+                ->setParentDocumentId('1000000257')
+                ->setTotal(
+                    (new Money())
+                        ->setCurrency((new Currency())->setCode('EUR'))
+                        ->setAmount('100')
+                ),
+            (new Transaction())
+                ->setCustomer('Vendor 1')
+                ->setVat('123456789')
+                ->setDocumentId('1000000261')
+                ->setType(3)
+                ->setParentDocumentId('1000000257')
+                ->setTotal(
+                    (new Money())
+                        ->setCurrency((new Currency())->setCode('GBP'))
+                        ->setAmount('50')
+                ),
+            (new Transaction())
+                ->setCustomer('Vendor 2')
+                ->setVat('1000000262')
+                ->setDocumentId('1000000258')
+                ->setType(2)
+                ->setParentDocumentId()
+                ->setTotal(
+                    (new Money())
+                        ->setCurrency((new Currency())->setCode('USD'))
+                        ->setAmount('200')
+                ),
+            (new Transaction())
+                ->setCustomer('Vendor 3')
+                ->setVat('123465123')
+                ->setDocumentId('1000000259')
+                ->setType(3)
+                ->setParentDocumentId()
+                ->setTotal(
+                    (new Money())
+                        ->setCurrency((new Currency())->setCode('EUR'))
+                        ->setAmount('100')
+                ),
+            (new Transaction())
+                ->setCustomer('Vendor 1')
+                ->setVat('123456789')
+                ->setDocumentId('1000000264')
+                ->setType(1)
+                ->setParentDocumentId()
+                ->setTotal(
+                    (new Money())
+                        ->setCurrency((new Currency())->setCode('EUR'))
+                        ->setAmount('1600')
+                ),
+        ];
         $this->denormalizer
             ->expects($this->exactly(8))
             ->method('denormalize')
@@ -281,96 +371,12 @@ class InvoiceImporterTest extends TestCase
                     Transaction::class,
                 ],
             )
-            ->willReturnOnConsecutiveCalls(
-                (new Transaction())
-                    ->setCustomer('Vendor 1')
-                    ->setVat('123456789')
-                    ->setDocumentId('1000000257')
-                    ->setType(1)
-                    ->setParentDocumentId()
-                    ->setTotal(
-                        (new Money())
-                            ->setCurrency((new Currency())->setCode('USD'))
-                            ->setAmount('400')
-                    ),
-                (new Transaction())
-                    ->setCustomer('Vendor 2')
-                    ->setVat('987654321')
-                    ->setDocumentId('1000000258')
-                    ->setType(1)
-                    ->setParentDocumentId()
-                    ->setTotal(
-                        (new Money())
-                            ->setCurrency((new Currency())->setCode('EUR'))
-                            ->setAmount('900')
-                    ),
-                (new Transaction())
-                    ->setCustomer('Vendor 3')
-                    ->setVat('123465123')
-                    ->setDocumentId('1000000259')
-                    ->setType(1)
-                    ->setParentDocumentId()
-                    ->setTotal(
-                        (new Money())
-                            ->setCurrency((new Currency())->setCode('GBP'))
-                            ->setAmount('1300')
-                    ),
-                (new Transaction())
-                    ->setCustomer('Vendor 1')
-                    ->setVat('123456789')
-                    ->setDocumentId('1000000260')
-                    ->setType(2)
-                    ->setParentDocumentId('1000000257')
-                    ->setTotal(
-                        (new Money())
-                            ->setCurrency((new Currency())->setCode('EUR'))
-                            ->setAmount('100')
-                    ),
-                (new Transaction())
-                    ->setCustomer('Vendor 1')
-                    ->setVat('123456789')
-                    ->setDocumentId('1000000261')
-                    ->setType(3)
-                    ->setParentDocumentId('1000000257')
-                    ->setTotal(
-                        (new Money())
-                            ->setCurrency((new Currency())->setCode('GBP'))
-                            ->setAmount('50')
-                    ),
-                (new Transaction())
-                    ->setCustomer('Vendor 2')
-                    ->setVat('1000000262')
-                    ->setDocumentId('1000000258')
-                    ->setType(2)
-                    ->setParentDocumentId()
-                    ->setTotal(
-                        (new Money())
-                            ->setCurrency((new Currency())->setCode('USD'))
-                            ->setAmount('200')
-                    ),
-                (new Transaction())
-                    ->setCustomer('Vendor 3')
-                    ->setVat('123465123')
-                    ->setDocumentId('1000000259')
-                    ->setType(3)
-                    ->setParentDocumentId()
-                    ->setTotal(
-                        (new Money())
-                            ->setCurrency((new Currency())->setCode('EUR'))
-                            ->setAmount('100')
-                    ),
-                (new Transaction())
-                    ->setCustomer('Vendor 1')
-                    ->setVat('123456789')
-                    ->setDocumentId('1000000264')
-                    ->setType(1)
-                    ->setParentDocumentId()
-                    ->setTotal(
-                        (new Money())
-                            ->setCurrency((new Currency())->setCode('EUR'))
-                            ->setAmount('1600')
-                    ),
-            )
+            ->willReturnOnConsecutiveCalls(...$transactions)
+        ;
+        $this->storageAdapter
+            ->expects($this->once())
+            ->method('update')
+            ->with('transaction', $transactions)
         ;
         $this->invoiceImporter->importInvoicesFromCsv('/tmp/csv');
     }

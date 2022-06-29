@@ -21,6 +21,7 @@ class InvoiceImporter
         private ValidatorInterface $validator,
         private DenormalizerInterface $denormalizer,
         private StorageAdapter $storageAdapter,
+        private FileReader $fileReader,
     ) {
     }
 
@@ -33,7 +34,7 @@ class InvoiceImporter
      */
     public function importInvoicesFromCsv(string $pathToCsv): void
     {
-        $transactionRecords = $this->decoder->decode(file_get_contents($pathToCsv), 'csv');
+        $transactionRecords = $this->decoder->decode($this->fileReader->readFileToString($pathToCsv), 'csv');
         if (0 === count($transactionRecords)) {
             throw new NoTransactionsProvidedException('No transactions provided');
         }

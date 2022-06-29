@@ -65,7 +65,7 @@ class Transaction
         return $this->parentDocumentId;
     }
 
-    public function setParentDocumentId(?string $parentDocumentId): self
+    public function setParentDocumentId(?string $parentDocumentId = null): self
     {
         $this->parentDocumentId = $parentDocumentId;
         return $this;

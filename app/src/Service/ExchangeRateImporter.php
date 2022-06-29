@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\DTO\Currency;
 use App\DTO\ExchangeRate;
 use App\Exception\MultipleDefaultCurrenciesProvidedException;
 use App\Exception\NoDefaultCurrencyProvidedException;
@@ -23,7 +24,7 @@ class ExchangeRateImporter
      */
     public function importMultipleRates(array $exchangeRates): void
     {
-        $defaultCurrency = $this->getDefaultCurrency($exchangeRates);
+        $defaultCurrency = $this->extractDefaultCurrency($exchangeRates);
         if (null === $this->storageAdapter->get(StorageAdapter::REPOSITORY_EXCHANGE_RATE)) {
             $this->storageAdapter->set(StorageAdapter::REPOSITORY_EXCHANGE_RATE, []);
         }
@@ -42,9 +43,9 @@ class ExchangeRateImporter
      *
      * @throws MultipleDefaultCurrenciesProvidedException
      * @throws NoDefaultCurrencyProvidedException
-     * @return ExchangeRate
+     * @return Currency
      */
-    private function getDefaultCurrency(array $exchangeRates): ExchangeRate
+    private function extractDefaultCurrency(array $exchangeRates): Currency
     {
         $defaultCurrency = null;
         $ratesEqualToOneCounter = 0;
@@ -56,7 +57,7 @@ class ExchangeRateImporter
         }
 
         if (1 === $ratesEqualToOneCounter) {
-            return $defaultCurrency;
+            return $defaultCurrency->getCurrency();
         } elseif (0 === $ratesEqualToOneCounter) {
             throw new NoDefaultCurrencyProvidedException('No default currency provided while importing.');
         }

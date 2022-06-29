@@ -1,0 +1,70 @@
+{
+	"info": {
+		"_postman_id": "bde42aad-7b89-4f6e-9cb3-34c15f9c6bfb",
+		"name": "DesignTech",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Sum Invoice",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"contentType": "text/csv",
+							"type": "file",
+							"src": "/C:/Users/ilian/Desktop/invoices.csv"
+						},
+						{
+							"key": "exchangeRates[0]",
+							"value": "EUR:1.75",
+							"contentType": "text/plain",
+							"type": "default"
+						},
+						{
+							"key": "outputCurrency",
+							"value": "USD",
+							"contentType": "text/plain",
+							"type": "default"
+						},
+						{
+							"key": "customerVat",
+							"value": "",
+							"contentType": "text/plain",
+							"type": "default"
+						},
+						{
+							"key": "exchangeRates[1]",
+							"value": "GBP:0.878",
+							"contentType": "text/plain",
+							"type": "default"
+						},
+						{
+							"key": "exchangeRates[2]",
+							"value": "USD:1",
+							"contentType": "text/plain",
+							"type": "default"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:8000/api/v1/sumInvoices",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"v1",
+						"sumInvoices"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

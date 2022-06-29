@@ -14,5 +14,5 @@
 * Use the Postman collection included in the repo to make a request
 
 ### To run the tests:
-*  docker exec -it  invoicing-api-php bash
+* docker exec -it  invoicing-api-php bash
 * bin/phpunit to run tests

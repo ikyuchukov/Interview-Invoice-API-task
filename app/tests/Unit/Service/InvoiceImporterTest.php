@@ -6,6 +6,7 @@ namespace App\Tests\Unit\Service;
 use App\DTO\Currency;
 use App\DTO\Money;
 use App\DTO\Transaction;
+use App\Exception\NoTransactionsProvidedException;
 use App\Service\FileReader;
 use App\Service\InvoiceImporter;
 use App\Storage\StorageAdapter;
@@ -378,6 +379,22 @@ class InvoiceImporterTest extends TestCase
             ->method('update')
             ->with('transaction', $transactions)
         ;
+        $this->invoiceImporter->importInvoicesFromCsv('/tmp/csv');
+    }
+
+    public function testImportInvoicesFromCsvEmptyCsv()
+    {
+        $this->fileReader
+            ->expects($this->once())
+            ->method('readFileToString')
+            ->with('/tmp/csv')
+        ;
+        $this->decoder
+            ->expects($this->once())
+            ->method('decode')
+            ->willReturn([])
+        ;
+        $this->expectException(NoTransactionsProvidedException::class);
         $this->invoiceImporter->importInvoicesFromCsv('/tmp/csv');
     }
 }

@@ -5,12 +5,12 @@ namespace App\DTO;
 
 class CalculateResponse
 {
-    public string $currency;
+    private string $currency;
 
     /**
      * @var Customer[]
      */
-    public array $customers;
+    private array $customers;
 
     /**
      * @return string

@@ -92,7 +92,7 @@ class InvoiceController extends AbstractController
         }
 
         $calculateResponse = $this->createCalculateResponse($summedInvoices);
-        return (new JsonResponse($this->serializer->serialize($calculateResponse, JsonEncoder::FORMAT)));
+        return (new JsonResponse())->setJson($this->serializer->serialize($calculateResponse, JsonEncoder::FORMAT));
     }
 
     /**

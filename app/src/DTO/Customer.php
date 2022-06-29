@@ -5,8 +5,8 @@ namespace App\DTO;
 
 class Customer
 {
-    public string $name;
-    public string $balance;
+    private string $name;
+    private string $balance;
 
     /**
      * @return string

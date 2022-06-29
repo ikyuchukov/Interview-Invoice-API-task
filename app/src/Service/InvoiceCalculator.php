@@ -7,14 +7,7 @@ use App\DTO\Currency;
 use App\DTO\CustomerInvoiceSummary;
 use App\DTO\Money;
 use App\DTO\Transaction;
-use App\Exception\InvalidTransactionException;
-use App\Exception\NoExchangeRateForCurrencyException;
 use App\Storage\StorageAdapter;
-use Symfony\Component\Serializer\Encoder\DecoderInterface;
-use Symfony\Component\Serializer\Exception\ExceptionInterface;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
-use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class InvoiceCalculator
 {
@@ -99,15 +92,7 @@ class InvoiceCalculator
 
         return $total;
     }
-
-    private function transactionCurrencyIsSameAsDefault(Transaction $transaction): bool
-    {
-        return
-            $this->exchangeRateGetter->getDefaultExchangeRate()->getCurrency()->getCode()
-            === $transaction->getTotal()->getCurrency()->getCode()
-        ;
-    }
-
+    
     /**
      * @param Transaction[] $transactions
      * @param Currency $outputCurrency

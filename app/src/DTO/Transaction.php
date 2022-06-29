@@ -5,6 +5,10 @@ namespace App\DTO;
 
 class Transaction
 {
+    public const TYPE_INVOICE = 1;
+    public const TYPE_CREDIT = 2;
+    public const TYPE_DEBIT = 3;
+
     private string $customer;
     private string $vat;
     private string $documentId;

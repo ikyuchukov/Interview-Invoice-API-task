@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace App\Controller;
 
+use App\DTO\Currency;
 use App\DTO\ExchangeRate;
 use App\Exception\InvalidArgumentException;
 use App\Exception\InvalidCurrencyException;
@@ -78,7 +79,12 @@ class InvoiceController extends AbstractController
             return (new JsonResponse(status: 400));
         }
 
-        if ($customerVat){}
+        $outputCurrency = (new Currency())->setCode($outputCurrency);
+        if (null !== $customerVat) {
+            $this->invoiceCalculator->sumInvoicesForClient($customerVat, $outputCurrency);
+        } else {
+            $this->invoiceCalculator->sumAllInvoices($outputCurrency);
+        }
 
 
         return (new JsonResponse());

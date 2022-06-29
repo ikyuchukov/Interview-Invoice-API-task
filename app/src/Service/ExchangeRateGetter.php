@@ -15,8 +15,14 @@ class ExchangeRateGetter
     ) {
     }
 
-    public function getExchangeRate(string $currencyCode)
+    public function getExchangeRate(string $currencyCode): ?ExchangeRate
     {
-        return $this->storageAdapter->get(StorageAdapter::REPOSITORY_EXCHANGE_RATE);
+        $exchangeRates = $this->storageAdapter->get(StorageAdapter::REPOSITORY_EXCHANGE_RATE);
+        return $exchangeRates[$currencyCode] ?? null;
+    }
+
+    public function getDefaultExchangeRate(): ExchangeRate
+    {
+        return $this->storageAdapter->get(StorageAdapter::REPOSITORY_DEFAULT_CURRENCY);
     }
 }

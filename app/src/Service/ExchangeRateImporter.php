@@ -49,7 +49,7 @@ class ExchangeRateImporter
         $defaultCurrency = null;
         $ratesEqualToOneCounter = 0;
         foreach ($exchangeRates as $exchangeRate) {
-            if (0 === bccomp($exchangeRate->getRate(), '1')) {
+            if (0 === bccomp($exchangeRate->getRate(), '1', 6)) {
                 $ratesEqualToOneCounter++;
                 $defaultCurrency = $exchangeRate;
             }

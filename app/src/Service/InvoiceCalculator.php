@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\DTO\Currency;
+use App\DTO\CustomerInvoiceSummary;
 use App\DTO\Money;
 use App\DTO\Transaction;
 use App\Exception\InvalidTransactionException;
@@ -24,16 +25,26 @@ class InvoiceCalculator
     ) {
     }
 
-    public function sumAllInvoices(Currency $outputCurrency)
+    /**
+     * @param Currency $outputCurrency
+     *
+     * @return CustomerInvoiceSummary[]
+     */
+    public function sumAllInvoices(Currency $outputCurrency): array
     {
         $transactions = $this->storageAdapter->get(StorageAdapter::REPOSITORY_TRANSACTION);
         $segregatedTransactions = $this->segregateTransactionsByClient($transactions);
         $totalByClient = [];
-        foreach ($segregatedTransactions as $customerTransactions) {
-            $totalByClient[] = $this->sumInvoices($customerTransactions, $outputCurrency);
+        foreach ($segregatedTransactions as $client => $customerTransactions) {
+            $total = $this->sumInvoices($customerTransactions, $outputCurrency);
+            $customerInvoiceSummary = (new CustomerInvoiceSummary())
+                ->setCustomer($client)
+                ->setTotal($total)
+            ;
+            $totalByClient[] = $customerInvoiceSummary;
         }
 
-
+        return $totalByClient;
     }
 
     public function sumInvoicesForClient(string $vat)
@@ -43,8 +54,10 @@ class InvoiceCalculator
 
     /**
      * @param Transaction[] $transactions
+     *
+     * @return array [string][Transaction[]]
      */
-    private function segregateTransactionsByClient(array $transactions)
+    private function segregateTransactionsByClient(array $transactions): array
     {
         $transactionsByClient = [];
         foreach ($transactions as $transaction) {

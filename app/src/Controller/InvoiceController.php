@@ -3,7 +3,10 @@ declare(strict_types = 1);
 
 namespace App\Controller;
 
+use App\DTO\CalculateResponse;
 use App\DTO\Currency;
+use App\DTO\Customer;
+use App\DTO\CustomerInvoiceSummary;
 use App\DTO\ExchangeRate;
 use App\Exception\InvalidArgumentException;
 use App\Exception\InvalidCurrencyException;
@@ -18,12 +21,13 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Constraints\All as AllConstraint;
 use Symfony\Component\Validator\Constraints\Currency as CurrencyConstraint;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class InvoiceController extends AbstractController
@@ -35,6 +39,7 @@ class InvoiceController extends AbstractController
         private ExchangeRateImporter $exchangeRateImporter,
         private InvoiceImporter $invoiceImporter,
         private InvoiceCalculator $invoiceCalculator,
+        private SerializerInterface $serializer,
     ) {
     }
 
@@ -83,11 +88,11 @@ class InvoiceController extends AbstractController
         if (null !== $customerVat) {
             $this->invoiceCalculator->sumInvoicesForClient($customerVat, $outputCurrency);
         } else {
-            $this->invoiceCalculator->sumAllInvoices($outputCurrency);
+            $summedInvoices = $this->invoiceCalculator->sumAllInvoices($outputCurrency);
         }
 
-
-        return (new JsonResponse());
+        $calculateResponse = $this->createCalculateResponse($summedInvoices);
+        return (new JsonResponse($this->serializer->serialize($calculateResponse, JsonEncoder::FORMAT)));
     }
 
     /**
@@ -148,5 +153,25 @@ class InvoiceController extends AbstractController
         }
 
         return $exchangeRateDTOs;
+    }
+
+    /**
+     * @param CustomerInvoiceSummary[] $summedInvoices
+     *
+     * @return CalculateResponse
+     */
+    private function createCalculateResponse(array $summedInvoices): CalculateResponse
+    {
+        $calculateResponse = (new CalculateResponse());
+        foreach ($summedInvoices as $summedInvoice) {
+            $calculateResponse->addCustomer(
+                (new Customer())
+                    ->setName($summedInvoice->getCustomer())
+                    ->setBalance($summedInvoice->getTotal()->getAmount())
+            );
+        }
+        $calculateResponse->setCurrency($summedInvoice->getTotal()->getCurrency()->getCode());
+
+        return $calculateResponse;
     }
 }

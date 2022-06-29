@@ -21,6 +21,7 @@ class CurrencyConvertor
         private ExchangeRateGetter $exchangeRateGetter
     ) {
     }
+
     public function convertTo(Money $money, Currency $currency): Money
     {
         $convertedMoney = (new Money())->setCurrency($currency)->setAmount('0');

@@ -13,7 +13,6 @@ class InvoiceCalculator
 {
     public function __construct(
         private StorageAdapter $storageAdapter,
-        private ExchangeRateGetter $exchangeRateGetter,
         private CurrencyConvertor $currencyConvertor
     ) {
     }
@@ -92,7 +91,7 @@ class InvoiceCalculator
 
         return $total;
     }
-    
+
     /**
      * @param Transaction[] $transactions
      * @param Currency $outputCurrency

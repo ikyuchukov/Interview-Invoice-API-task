@@ -4,8 +4,6 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\DTO\ExchangeRate;
-use App\Exception\MultipleDefaultCurrenciesProvidedException;
-use App\Exception\NoDefaultCurrencyProvidedException;
 use App\Storage\StorageAdapter;
 
 class ExchangeRateGetter

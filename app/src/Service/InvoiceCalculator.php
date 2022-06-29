@@ -7,13 +7,13 @@ use App\DTO\Currency;
 use App\DTO\CustomerInvoiceSummary;
 use App\DTO\Money;
 use App\DTO\Transaction;
-use App\Storage\StorageAdapter;
+use App\Exception\NoTransactionsFoundForProvidedVatException;
 
 class InvoiceCalculator
 {
     public function __construct(
-        private StorageAdapter $storageAdapter,
-        private CurrencyConvertor $currencyConvertor
+        private CurrencyConvertor $currencyConvertor,
+        private TransactionGetter $transactionGetter,
     ) {
     }
 
@@ -24,7 +24,7 @@ class InvoiceCalculator
      */
     public function sumAllInvoices(Currency $outputCurrency): array
     {
-        $transactions = $this->storageAdapter->get(StorageAdapter::REPOSITORY_TRANSACTION);
+        $transactions = $this->transactionGetter->getAllTransactions();
         $segregatedTransactions = $this->segregateTransactionsByClient($transactions);
         $totalByClient = [];
         foreach ($segregatedTransactions as $client => $customerTransactions) {
@@ -39,9 +39,27 @@ class InvoiceCalculator
         return $totalByClient;
     }
 
-    public function sumInvoicesForClient(string $vat)
+    /**
+     * @param string $vat
+     * @param Currency $outputCurrency
+     *
+     * @throws NoTransactionsFoundForProvidedVatException
+     * @return CustomerInvoiceSummary
+     */
+    public function sumInvoicesForClient(string $vat, Currency $outputCurrency): CustomerInvoiceSummary
     {
-
+        $transactions = $this->transactionGetter->getTransactionsByVat($vat);
+        if (0 === count($transactions)) {
+            throw new NoTransactionsFoundForProvidedVatException(sprintf(
+                'No transactions found for provided VAT %s',
+                $vat
+            ));
+        }
+        $total = $this->sumInvoices($transactions, $outputCurrency);
+        return (new CustomerInvoiceSummary())
+            ->setCustomer($transactions[0]->getCustomer())
+            ->setTotal($total)
+        ;
     }
 
     /**

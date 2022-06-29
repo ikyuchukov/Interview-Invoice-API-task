@@ -12,6 +12,7 @@ use App\Exception\InvalidArgumentException;
 use App\Exception\InvalidCurrencyException;
 use App\Exception\InvalidCurrencyRatesException;
 use App\Exception\InvalidVatException;
+use App\Exception\NoTransactionsFoundForProvidedVatException;
 use App\Service\ExchangeRateImporter;
 use App\Service\InvoiceCalculator;
 use App\Service\InvoiceImporter;
@@ -86,7 +87,11 @@ class InvoiceController extends AbstractController
 
         $outputCurrency = (new Currency())->setCode($outputCurrency);
         if (null !== $customerVat) {
-            $this->invoiceCalculator->sumInvoicesForClient($customerVat, $outputCurrency);
+            try {
+                $summedInvoices[]= $this->invoiceCalculator->sumInvoicesForClient($customerVat, $outputCurrency);
+            } catch (NoTransactionsFoundForProvidedVatException $noTransactionsFoundForProvidedVatException) {
+                return (new JsonResponse(status: 404));
+            }
         } else {
             $summedInvoices = $this->invoiceCalculator->sumAllInvoices($outputCurrency);
         }

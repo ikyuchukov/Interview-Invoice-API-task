@@ -6,6 +6,7 @@ namespace App\Service;
 use App\DTO\Transaction;
 use App\Exception\InvalidTransactionException;
 use App\Exception\NoExchangeRateForCurrencyException;
+use App\Exception\NoTransactionsProvidedException;
 use App\Storage\StorageAdapter;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
@@ -28,10 +29,14 @@ class InvoiceImporter
      *
      * @throws ExceptionInterface
      * @throws NoExchangeRateForCurrencyException
+     * @throws NoTransactionsProvidedException
      */
     public function importInvoicesFromCsv(string $pathToCsv): void
     {
         $transactionRecords = $this->decoder->decode(file_get_contents($pathToCsv), 'csv');
+        if (0 === count($transactionRecords)) {
+            throw new NoTransactionsProvidedException('No transactions provided');
+        }
         $this->validateTransactionArray($transactionRecords);
         $transactions = [];
         foreach ($transactionRecords as $transactionRecord ) {
